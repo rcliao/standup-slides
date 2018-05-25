@@ -1,0 +1,35 @@
+{
+  "name": "standup-slides",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack",
+    "client": "webpack-dev-server --port 3000"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rcliao/standup-slides.git"
+  },
+  "author": "Eric Liao <rcliao01@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/rcliao/standup-slides/issues"
+  },
+  "homepage": "https://github.com/rcliao/standup-slides#readme",
+  "dependencies": {
+    "@webcomponents/webcomponentsjs": "^2.0.0",
+    "css-loader": "^0.28.11",
+    "elm-webpack-loader": "^4.5.0",
+    "file-loader": "^1.1.11",
+    "style-loader": "^0.21.0",
+    "url-loader": "^1.0.1",
+    "webpack": "^4.8.3",
+    "webpack-dev-server": "^3.1.4",
+    "wired-elements": "^0.5.6"
+  },
+  "devDependencies": {
+    "webpack-cli": "^2.1.4"
+  }
+}

@@ -5,6 +5,7 @@ import Html.Attributes exposing (placeholder, type_)
 import Html.Events exposing (onInput)
 
 
+main : Program Never Model Msg
 main =
     Html.beginnerProgram
         { model = model
@@ -48,7 +49,9 @@ update msg model =
 
 view : Model -> Html Msg
 view model =
-    div []
-        [ input [ type_ "text", placeholder "Name", onInput Name ] []
+    Html.node "wired-card"
+        []
+        [ Html.node "wired-input" [ type_ "text", placeholder "Name", onInput Name ] []
         , div [] [ text model.name ]
+        , Html.node "wired-button" [] [ text "Hello button" ]
         ]
