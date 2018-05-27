@@ -53,5 +53,4 @@ view model =
         []
         [ Html.node "wired-input" [ type_ "text", placeholder "Name", onInput Name ] []
         , div [] [ text model.name ]
-        , Html.node "wired-button" [] [ text "Hello button" ]
         ]
