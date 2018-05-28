@@ -1,9 +1,8 @@
 module Main exposing (..)
 
 import Html exposing (Html, button, div, text, input)
-import Html.Attributes exposing (placeholder, type_)
-import Html.Events exposing (onInput)
-
+import Html.Attributes exposing (placeholder, class, type_)
+import Html.Events exposing (onClick)
 
 main : Program Never Model Msg
 main =
@@ -13,15 +12,10 @@ main =
         , update = update
         }
 
-
-
 -- Model
-
-
 type alias Model =
     { name : String
     }
-
 
 model : Model
 model =
@@ -34,6 +28,7 @@ model =
 
 type Msg
     = Name String
+    | Login
 
 
 update : Msg -> Model -> Model
@@ -41,6 +36,8 @@ update msg model =
     case msg of
         Name name ->
             { model | name = name }
+        Login ->
+            { model | name = "login" }
 
 
 
@@ -49,8 +46,8 @@ update msg model =
 
 view : Model -> Html Msg
 view model =
-    Html.node "wired-card"
+    div
         []
-        [ Html.node "wired-input" [ type_ "text", placeholder "Name", onInput Name ] []
-        , div [] [ text model.name ]
+        [
+        button [ class "login-button", onClick Login ] [ text model.name ]
         ]

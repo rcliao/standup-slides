@@ -1,7 +1,5 @@
 'use strict';
 
-import '@webcomponents/webcomponentsjs/webcomponents-bundle';
-import 'wired-elements';
 import './app.css';
 
 // Require index.html so it gets copied to dist
