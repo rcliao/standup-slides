@@ -20,7 +20,10 @@ export function setupAuth (app, authorizedOrganizations) {
                 }
                 var user = result.user;
                 console.log(user);
-                app.ports.loginUser.send(user.displayName);
+                app.ports.loginUser.send({
+                    name: user.displayName,
+                    photoURL: user.photoURL
+                });
             });
         }).catch(function(error) {
             console.error(error);

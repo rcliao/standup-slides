@@ -1,5 +1,6 @@
 'use strict';
 
+import 'animate.css';
 import './app.css';
 
 // Require index.html so it gets copied to dist
