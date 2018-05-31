@@ -3,8 +3,11 @@
 import 'animate.css';
 import './app.css';
 
+import '@material/mwc-button';
+
 // Require index.html so it gets copied to dist
 import './index.html';
+
 import { setupAuth } from './auth';
 import { init } from './service';
 

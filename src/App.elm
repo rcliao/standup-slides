@@ -1,10 +1,8 @@
 port module Main exposing (..)
 
-import Html exposing (Html, button, div, text, input, h1)
-import Html.Attributes exposing (placeholder, class, type_)
-import Material
-import Material.Button as Button
-import Material.Options as Options exposing (css)
+import Html exposing (..)
+import Html.Attributes exposing (..)
+import Html.Events exposing (..)
 
 
 main : Program Never Model Msg
@@ -21,6 +19,12 @@ main =
 -- Model
 
 
+type Route
+    = Summary
+    | Notes
+    | StandUp
+
+
 type alias User =
     { name : String
     , photoURL : String
@@ -29,14 +33,14 @@ type alias User =
 
 type alias Model =
     { user : User
+    , route : Route
     , state : String
-    , mdl : Material.Model
     }
 
 
 init : ( Model, Cmd Msg )
 init =
-    ( Model (User "" "") "" Material.model, Cmd.none )
+    ( Model (User "" "") Summary "", Cmd.none )
 
 
 
@@ -46,7 +50,7 @@ init =
 type Msg
     = Login
     | LoginUser User
-    | Mdl (Material.Msg Msg)
+    | RouteMain Route
 
 
 port login : String -> Cmd msg
@@ -59,10 +63,10 @@ update msg model =
             ( { model | state = "logging" }, login "" )
 
         LoginUser user ->
-            ( { model | user = user, state = "login" }, Cmd.none )
+            ( { model | user = user }, Cmd.none )
 
-        Mdl msg_ ->
-            Material.update Mdl msg_ model
+        RouteMain route ->
+            ( { model | route = route }, Cmd.none )
 
 
 
@@ -81,10 +85,6 @@ subscriptions model =
 -- View
 
 
-type alias Mdl =
-    Material.Model
-
-
 view : Model -> Html Msg
 view model =
     simpleRoute model
@@ -92,15 +92,96 @@ view model =
 
 simpleRoute : Model -> Html Msg
 simpleRoute model =
-    if model.state == "login" then
-        div
-            []
-            [ text ("Hello " ++ model.user.name) ]
+    if model.user.name /= "" then
+        mainView model
     else
-        div
-            [ class "login-container" ]
-            [ div [ class "animated fadeInDown" ]
-                [ h1 [] [ text "Stand-up Notes" ]
-                , Button.render Mdl [ 2 ] model.mdl [ Options.onClick Login, Button.ripple, Button.colored, Button.raised ] [ text "Login with Github" ]
+        loginView model
+
+
+mainView : Model -> Html Msg
+mainView model =
+    div
+        [ class "main-container" ]
+        [ mainNavView model
+        , mainRouteView model
+        ]
+
+
+mainRouteView : Model -> Html Msg
+mainRouteView model =
+    case model.route of
+        Summary ->
+            summaryView model
+
+        Notes ->
+            notesView model
+
+        StandUp ->
+            standUpView model
+
+
+summaryView : Model -> Html Msg
+summaryView model =
+    div []
+        [ text "Hello "
+        , b [] [ text model.user.name ]
+        , pre [] [ text """# Weekly Note
+
+
+## Eric Liao
+
+
+### Last Week
+
+* Hello
+* Hello 2
+
+
+### This week
+
+* Feature 1
+* Fix 2
+
+
+### Blocker
+
+* QA
+""" ]
+        ]
+
+
+notesView : Model -> Html Msg
+notesView model =
+    div [] [ text "Insert Editor here" ]
+
+
+standUpView : Model -> Html Msg
+standUpView model =
+    div [] [ text "Insert reveal.js presentation here" ]
+
+
+mainNavView : Model -> Html Msg
+mainNavView model =
+    nav
+        []
+        [ a [ onClick (RouteMain Summary) ] [ text "Summary" ]
+        , a [ onClick (RouteMain Notes) ] [ text "Notes" ]
+        , a [ onClick (RouteMain StandUp) ] [ text "Stand-up" ]
+        ]
+
+
+loginView : Model -> Html Msg
+loginView model =
+    div
+        [ class "login-container" ]
+        [ div [ class "animated fadeInDown" ]
+            [ h1 [] [ text "Stand-up Notes" ]
+            , node "mwc-button"
+                [ class "light"
+                , onClick Login
+                , attribute "raised" "true"
+                , attribute "label" "Login with Github"
                 ]
+                []
             ]
+        ]
