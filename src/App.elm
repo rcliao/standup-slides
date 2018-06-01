@@ -33,6 +33,7 @@ type alias User =
 
 type alias Model =
     { user : User
+    , personalNote : String
     , route : Route
     , state : String
     }
@@ -40,7 +41,7 @@ type alias Model =
 
 init : ( Model, Cmd Msg )
 init =
-    ( Model (User "" "") Summary "", Cmd.none )
+    ( Model (User "" "") "" Summary "", Cmd.none )
 
 
 
@@ -56,6 +57,9 @@ type Msg
 port login : String -> Cmd msg
 
 
+port renderEditor : String -> Cmd msg
+
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
@@ -66,7 +70,7 @@ update msg model =
             ( { model | user = user }, Cmd.none )
 
         RouteMain route ->
-            ( { model | route = route }, Cmd.none )
+            ( { model | route = route }, renderEditor (toString route) )
 
 
 
@@ -152,7 +156,7 @@ summaryView model =
 
 notesView : Model -> Html Msg
 notesView model =
-    div [] [ text "Insert Editor here" ]
+    textarea [ id "note_editor" ] [ text model.personalNote ]
 
 
 standUpView : Model -> Html Msg

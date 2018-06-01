@@ -4,11 +4,13 @@ import 'animate.css';
 import './app.css';
 
 import '@material/mwc-button';
+import 'simplemde/dist/simplemde.min.css';
 
 // Require index.html so it gets copied to dist
 import './index.html';
 
 import { setupAuth } from './auth';
+import { setupEditor } from './view';
 import { init } from './service';
 
 const authorizedOrganizations = ['Edlio'];
@@ -20,4 +22,5 @@ const mountNode = document.getElementById('main');
 const app = Elm.Main.embed(mountNode);
 
 setupAuth(app, authorizedOrganizations);
+setupEditor(app);
 init();
