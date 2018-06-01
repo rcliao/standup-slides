@@ -21,6 +21,9 @@ a {
     color: #f44336;
     cursor: pointer;
 }
+a:hover {
+    text-decoration: underline;
+}
 
 @media (max-width: 684px) {
     body {

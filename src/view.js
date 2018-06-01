@@ -13,8 +13,10 @@ export function setupEditor (app) {
                 }
             });
         } else {
-            editor.toTextArea();
-            editor = null;
+            if (editor) {
+                editor.toTextArea();
+                editor = null;
+            }
         }
     });
 }
