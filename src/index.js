@@ -1,5 +1,3 @@
-'use strict';
-
 import 'animate.css';
 import './app.css';
 
@@ -9,18 +7,43 @@ import 'simplemde/dist/simplemde.min.css';
 // Require index.html so it gets copied to dist
 import './index.html';
 
-import { setupAuth } from './auth';
-import { setupEditor } from './view';
-import { init } from './service';
+import { render as renderEditor, cleanup as cleanupEditor} from './views/editor';
+import FirebaseService from './services/firebase';
+import ElmService from './services/elm';
+import NotesFirebaseDAO from './dao/firebase';
+import * as Elm from './App.elm';
 
+// constant configurations
 const authorizedOrganizations = ['Edlio'];
+const config = {
+    apiKey: 'AIzaSyBVYU5wYUV-qnk0ne2_rxJCZyFEFxAlEOs',
+    authDomain: 'standup-notes.firebaseapp.com',
+    projectId: 'standup-notes'
+};
 
-const Elm = require('./App.elm');
 const mountNode = document.getElementById('main');
-
-// The third value on embed are the initial values for incomming ports into Elm
 const app = Elm.Main.embed(mountNode);
 
-setupAuth(app, authorizedOrganizations);
-setupEditor(app);
-init();
+const elmService = new ElmService(app);
+const firebaseService = new FirebaseService(config);
+const db = firebaseService.db;
+const notesDAO = new NotesFirebaseDAO(db);
+
+// routing for events to component and vice versa
+elmService.on('login', () => {
+    firebaseService.login(authorizedOrganizations)
+        .then(user => {
+            elmService.send('loginUser', user);
+        })
+        .catch(err => {
+            console.error(err);
+            elmService.send('loginUserFailure', err);
+        });
+});
+elmService.on('viewChange', viewName => {
+    if (viewName === 'Notes') {
+        renderEditor();
+    } else {
+        cleanupEditor();
+    }
+});

@@ -1,4 +1,4 @@
-export function setupAuth (app, authorizedOrganizations) {
+export function setupAuth (app, firebase, authorizedOrganizations) {
     app.ports.login.subscribe(function() {
         const provider = new firebase.auth.GithubAuthProvider();
         // getting organization for authorization
@@ -19,7 +19,6 @@ export function setupAuth (app, authorizedOrganizations) {
                     app.ports.loginFailure.send('User is not in the valid Github organization ' + authorizedOrganizations.join(','));
                 }
                 var user = result.user;
-                console.log(user);
                 app.ports.loginUser.send({
                     name: user.displayName,
                     photoURL: user.photoURL

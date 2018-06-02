@@ -57,7 +57,7 @@ type Msg
 port login : String -> Cmd msg
 
 
-port renderEditor : String -> Cmd msg
+port viewChange : String -> Cmd msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -70,7 +70,7 @@ update msg model =
             ( { model | user = user }, Cmd.none )
 
         RouteMain route ->
-            ( { model | route = route }, renderEditor (toString route) )
+            ( { model | route = route }, viewChange (toString route) )
 
 
 
