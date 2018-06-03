@@ -3,6 +3,49 @@ port module Main exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
+import Task
+import Date exposing (..)
+import Date.Extra as Date
+
+
+noteTemplate : String -> String
+noteTemplate username =
+    "# "
+        ++ username
+        ++ """
+
+## Last week
+* Work on feature 1
+
+
+## This week
+* Continue with feature 2
+
+
+## Blockers
+* Need help on CC
+"""
+
+
+port login : () -> Cmd msg
+
+
+port getNotes : NoteID -> Cmd msg
+
+
+port setPersonalNote : UserNote -> Cmd msg
+
+
+port viewChange : String -> Cmd msg
+
+
+port loginUser : (User -> msg) -> Sub msg
+
+
+port personalNote : (String -> msg) -> Sub msg
+
+
+port allNotes : (String -> msg) -> Sub msg
 
 
 main : Program Never Model Msg
@@ -25,6 +68,19 @@ type Route
     | StandUp
 
 
+type alias UserNote =
+    { username : String
+    , id : String
+    , content : String
+    }
+
+
+type alias NoteID =
+    { username : String
+    , id : String
+    }
+
+
 type alias User =
     { name : String
     , photoURL : String
@@ -32,8 +88,10 @@ type alias User =
 
 
 type alias Model =
-    { user : User
-    , personalNote : String
+    { user : Maybe User
+    , currentDate : Maybe Date
+    , personalNote : Maybe String
+    , allNotes : Maybe String
     , route : Route
     , state : String
     }
@@ -41,7 +99,7 @@ type alias Model =
 
 init : ( Model, Cmd Msg )
 init =
-    ( Model (User "" "") "" Summary "", Cmd.none )
+    ( Model Nothing Nothing Nothing Nothing Summary "", (Task.perform GotDate Date.now) )
 
 
 
@@ -52,37 +110,49 @@ type Msg
     = Login
     | LoginUser User
     | RouteMain Route
-
-
-port login : String -> Cmd msg
-
-
-port viewChange : String -> Cmd msg
+    | GetAllNotes String
+    | GetPersonalNote String
+    | GotDate Date
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         Login ->
-            ( { model | state = "logging" }, login "" )
+            ( { model | state = "logging" }, login () )
+
+        GotDate date ->
+            ( { model | currentDate = Just date }, Cmd.none )
 
         LoginUser user ->
-            ( { model | user = user }, Cmd.none )
+            ( { model | user = Just user }, getNotes (NoteID user.name (getCurrentWeekNumber model.currentDate)) )
 
         RouteMain route ->
-            ( { model | route = route }, viewChange (toString route) )
+            ( { model | route = route }
+            , if route == model.route then
+                Cmd.none
+              else
+                viewChange (toString route)
+            )
+
+        GetAllNotes notes ->
+            ( { model | allNotes = Just notes }, Cmd.none )
+
+        GetPersonalNote note ->
+            ( { model | personalNote = Just note }, (setPersonalNote (UserNote (getUserName model.user) (getCurrentWeekNumber model.currentDate) note)) )
 
 
 
 -- Subscriptions
 
 
-port loginUser : (User -> msg) -> Sub msg
-
-
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    loginUser LoginUser
+    Sub.batch
+        [ loginUser LoginUser
+        , personalNote GetPersonalNote
+        , allNotes GetAllNotes
+        ]
 
 
 
@@ -96,7 +166,7 @@ view model =
 
 simpleRoute : Model -> Html Msg
 simpleRoute model =
-    if model.user.name /= "" then
+    if model.user /= Nothing then
         mainView model
     else
         loginView model
@@ -128,35 +198,14 @@ summaryView : Model -> Html Msg
 summaryView model =
     div []
         [ text "Hello "
-        , b [] [ text model.user.name ]
-        , pre [] [ text """# Weekly Note
-
-
-## Eric Liao
-
-
-### Last Week
-
-* Hello
-* Hello 2
-
-
-### This week
-
-* Feature 1
-* Fix 2
-
-
-### Blocker
-
-* QA
-""" ]
+        , b [] [ text (getUserName model.user) ]
+        , pre [] [ text (getAllNotes model.allNotes) ]
         ]
 
 
 notesView : Model -> Html Msg
 notesView model =
-    textarea [ id "note_editor" ] [ text model.personalNote ]
+    textarea [ id "note_editor" ] [ text (getPersonalNote model.personalNote model.user) ]
 
 
 standUpView : Model -> Html Msg
@@ -189,3 +238,44 @@ loginView model =
                 []
             ]
         ]
+
+
+
+-- Helpers
+
+
+getCurrentWeekNumber : Maybe Date -> String
+getCurrentWeekNumber date =
+    Maybe.map Date.weekNumber date
+        |> Maybe.withDefault 0
+        |> toString
+
+
+getUserName : Maybe User -> String
+getUserName user =
+    case user of
+        Nothing ->
+            "Unknown"
+
+        Just currentUser ->
+            currentUser.name
+
+
+getPersonalNote : Maybe String -> Maybe User -> String
+getPersonalNote note user =
+    case note of
+        Nothing ->
+            noteTemplate (getUserName user)
+
+        Just personalNote ->
+            personalNote
+
+
+getAllNotes : Maybe String -> String
+getAllNotes note =
+    case note of
+        Nothing ->
+            "No notes found"
+
+        Just allNotes ->
+            allNotes

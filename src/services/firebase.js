@@ -1,13 +1,13 @@
-import * as firebase from 'firebase';
+import firebase from 'firebase/app';
+import 'firebase/auth';
 import 'firebase/firestore';
 
 export default class Service {
     constructor (config) {
         firebase.initializeApp(config);
-    }
-
-    get db () {
-        return firebase.firestore();
+        const settings = {timestampsInSnapshots: true};
+        this.db = firebase.firestore();
+        this.db.settings(settings);
     }
 
     login (authorizedOrganizations) {

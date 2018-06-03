@@ -1,4 +1,4 @@
-export class Store {
+export class NotesDAO {
     constructor (storage) {
         this.storage = storage;
     }
@@ -11,18 +11,19 @@ export class Store {
             .set(personalNote, {merge: true});
     }
 
-    getPersonalNote (id, username) {
+    getPersonalNote (id, username, cb) {
         return this.storage.collection('notes')
             .doc(id)
-            .get()
-            .then(doc => {
-                return doc[username];
+            .onSnapshot(doc => {
+                cb(doc[username]);
             });
     }
 
-    getAllNotes (id) {
+    getAllNotes (id, cb) {
         return this.storage.collection('notes')
             .doc(id)
-            .get();
+            .onSnapshot(doc => {
+                cb(doc.data());
+            });
     }
 }
