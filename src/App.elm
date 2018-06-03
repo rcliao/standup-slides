@@ -139,7 +139,9 @@ update msg model =
             ( { model | allNotes = Just notes }, Cmd.none )
 
         GetPersonalNote note ->
-            ( { model | personalNote = Just note }, (setPersonalNote (UserNote (getUserName model.user) (getCurrentWeekNumber model.currentDate) note)) )
+            ( { model | personalNote = Just note }
+            , (setPersonalNote (UserNote (getUserName model.user) (getCurrentWeekNumber model.currentDate) note))
+            )
 
 
 
@@ -210,7 +212,23 @@ notesView model =
 
 standUpView : Model -> Html Msg
 standUpView model =
-    div [] [ text "Insert reveal.js presentation here" ]
+    div [ class "standup-container" ]
+        [ div [ class "reveal" ]
+            [ div [ class "slides" ]
+                [ section
+                    [ attribute "data-markdown" ""
+                    , attribute "data-separator" "^\\r?\\n\\r?\\n\\r?\\n"
+                    , attribute "data-separator-vertical" "^\\r?\\n\\r?\\n"
+                    , attribute "data-charset" "iso-8859-15"
+                    ]
+                    [ textarea
+                        [ attribute "data-template" ""
+                        ]
+                        [ text (getAllNotes model.allNotes) ]
+                    ]
+                ]
+            ]
+        ]
 
 
 mainNavView : Model -> Html Msg

@@ -87,17 +87,30 @@ h1, h2, h3, h4, h5, h6 {
     overflow: auto;
 }
 
+.standup-container {
+    height: 20em;
+}
+
 /* hacks */
 
 .main-container .editor-toolbar {
-    background-color: #222;
+    background-color: #222 !important;
     opacity: 1 !important;
 }
 .main-container .editor-toolbar a {
     color: #fff !important;
 }
-.main-container .editor-toolbar a:hover {
+.main-container .editor-toolbar a:hover,
+.main-container .editor-toolbar a.active {
     background-color: #666;
+}
+.main-container .editor-toolbar.disabled-for-preview a:not(.no-disable) {
+    background-color: #222;
+    opacity: 0.5;
+}
+.main-container .editor-preview,
+.main-container .editor-preview-side {
+    background-color: #222;
 }
 .main-container .CodeMirror {
     background-color: #222;

@@ -8,6 +8,7 @@ import 'simplemde/dist/simplemde.min.css';
 import './index.html';
 
 import { render as renderEditor, cleanup as cleanupEditor} from './views/editor';
+import { render as renderSlides } from './views/slides';
 import FirebaseService from './services/firebase';
 import ElmService from './services/elm';
 import {NotesDAO} from './dao/firebase';
@@ -49,8 +50,8 @@ elmService.on('getNotes', dateID => {
         const allNotes = Object.keys(notes).map(name => {
             return notes[name];
         }).reduce((accu, note) => {
-            return accu + '\n\n\n' + note;
-        }, '');
+            return accu + '\n\n\n\n' + note;
+        }, '# Stand-up Notes');
         elmService.send('allNotes', allNotes);
     });
 });
@@ -68,5 +69,10 @@ elmService.on('viewChange', viewName => {
         });
     } else {
         cleanupEditor();
+    }
+    if (viewName === 'StandUp') {
+        requestAnimationFrame(function() {
+            renderSlides();
+        });
     }
 });
