@@ -217,10 +217,30 @@ mainNavView : Model -> Html Msg
 mainNavView model =
     nav
         []
-        [ a [ onClick (RouteMain Summary) ] [ text "Summary" ]
-        , a [ onClick (RouteMain Notes) ] [ text "Notes" ]
-        , a [ onClick (RouteMain StandUp) ] [ text "Stand-up" ]
+        [ a
+            [ class (isNavigationActive model.route Summary)
+            , onClick (RouteMain Summary)
+            ]
+            [ text "Summary" ]
+        , a
+            [ class (isNavigationActive model.route Notes)
+            , onClick (RouteMain Notes)
+            ]
+            [ text "Notes" ]
+        , a
+            [ class (isNavigationActive model.route StandUp)
+            , onClick (RouteMain StandUp)
+            ]
+            [ text "Stand-up" ]
         ]
+
+
+isNavigationActive : Route -> Route -> String
+isNavigationActive currentNav nav =
+    if currentNav == nav then
+        "active"
+    else
+        ""
 
 
 loginView : Model -> Html Msg
