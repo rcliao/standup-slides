@@ -86,7 +86,17 @@ h1, h2, h3, h4, h5, h6 {
 
 /* hacks */
 
-.editor-toolbar {
-    background-color: #fff;
-    opacity: 1;
+.main-container .editor-toolbar {
+    background-color: #222;
+    opacity: 1 !important;
+}
+.main-container .editor-toolbar a {
+    color: #fff !important;
+}
+.main-container .editor-toolbar a:hover {
+    background-color: #666;
+}
+.main-container .CodeMirror {
+    background-color: #222;
+    color: #fff;
 }
