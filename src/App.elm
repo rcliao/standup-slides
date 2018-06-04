@@ -15,16 +15,17 @@ noteTemplate username =
         ++ username
         ++ """
 
+
 ## Last week
-* Work on feature 1
+* Category - short description
 
 
 ## This week
-* Continue with feature 2
+* Category - short description
 
 
 ## Blockers
-* Need help on CC
+* Need help on CC from {name of other}
 """
 
 
@@ -332,11 +333,20 @@ getNextWeekNumber date =
         |> toString
 
 
+getYear : Maybe Date -> String
+getYear date =
+    Maybe.map Date.weekYear date
+        |> Maybe.withDefault 0
+        |> toString
+
+
 getCurrentWeekNumber : Maybe Date -> String
 getCurrentWeekNumber date =
     Maybe.map Date.weekNumber date
         |> Maybe.withDefault 0
         |> toString
+        |> String.append "-"
+        |> String.append (getYear date)
 
 
 getUserName : Maybe User -> String

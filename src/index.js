@@ -49,11 +49,17 @@ elmService.on('jsGetPersonalNotes', dateID => {
 elmService.on('jsGetAllNotes', dateID => {
     notesDAO.getAllNotes(dateID.id, notes => {
         if (!notes) return;
-        const allNotes = Object.keys(notes).map(name => {
-            return notes[name];
-        }).reduce((accu, note) => {
-            return accu + '\n\n\n\n' + note;
-        }, '# Stand-up Notes');
+        const allNotes = Object.keys(notes)
+            .map(name => {
+                return notes[name];
+            })
+            // randomize presentation order
+            .map(a => [Math.random(), a])
+            .sort((a, b) => a[0] - b[0])
+            .map(a => a[1])
+            .reduce((accu, note) => {
+                return accu + '\n\n\n\n' + note;
+            }, '# Stand-up Notes');
         elmService.send('jsAllNotes', allNotes);
     });
 });

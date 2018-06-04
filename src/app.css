@@ -1,6 +1,5 @@
 /* basic typography */
-html {
-    font-size: 16px;
+html, body {
     overflow: auto;
 }
 
