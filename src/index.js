@@ -31,20 +31,22 @@ const db = firebaseService.db;
 const notesDAO = new NotesDAO(db);
 
 // routing for events to component and vice versa
-elmService.on('login', () => {
+elmService.on('jsLogin', () => {
     firebaseService.login(authorizedOrganizations)
         .then(user => {
-            elmService.send('loginUser', user);
+            elmService.send('jsLoginUser', user);
         })
         .catch(err => {
             console.error(err);
-            elmService.send('loginUserFailure', err);
+            elmService.send('jsLoginUserFailure', err);
         });
 });
-elmService.on('getNotes', dateID => {
+elmService.on('jsGetPersonalNotes', dateID => {
     notesDAO.getPersonalNote(dateID.id, dateID.username, data => {
-        console.log(data);
+        elmService.send('jsPersonalNote', data);
     });
+});
+elmService.on('jsGetAllNotes', dateID => {
     notesDAO.getAllNotes(dateID.id, notes => {
         if (!notes) return;
         const allNotes = Object.keys(notes).map(name => {
@@ -52,19 +54,18 @@ elmService.on('getNotes', dateID => {
         }).reduce((accu, note) => {
             return accu + '\n\n\n\n' + note;
         }, '# Stand-up Notes');
-        elmService.send('allNotes', allNotes);
+        elmService.send('jsAllNotes', allNotes);
     });
 });
-elmService.on('setPersonalNote', note => {
+elmService.on('jsSetPersonalNote', note => {
     notesDAO.setPersonalNote(note.id, note.username, note.content);
 });
-elmService.on('viewChange', viewName => {
+elmService.on('jsViewChange', viewName => {
     if (viewName === 'Notes') {
         // need animation frame to render after elm is done rendering
         requestAnimationFrame(function () { 
             renderEditor(value => {
-                console.log('note change:', value);
-                elmService.send('personalNote', value);
+                elmService.send('jsPersonalNote', value);
             });
         });
     } else {

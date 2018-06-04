@@ -1,11 +1,12 @@
 port module Main exposing (..)
 
+import Date exposing (..)
+import Date.Extra as Date
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
+import Markdown
 import Task
-import Date exposing (..)
-import Date.Extra as Date
 
 
 noteTemplate : String -> String
@@ -13,6 +14,7 @@ noteTemplate username =
     "# "
         ++ username
         ++ """
+
 
 ## Last week
 * Work on feature 1
@@ -27,25 +29,40 @@ noteTemplate username =
 """
 
 
-port login : () -> Cmd msg
+
+-- output
 
 
-port getNotes : NoteID -> Cmd msg
+port jsLogin : () -> Cmd msg
 
 
-port setPersonalNote : UserNote -> Cmd msg
+port jsGetAllNotes : NoteID -> Cmd msg
 
 
-port viewChange : String -> Cmd msg
+port jsGetPersonalNotes : NoteID -> Cmd msg
 
 
-port loginUser : (User -> msg) -> Sub msg
+port jsSetPersonalNote : UserNote -> Cmd msg
 
 
-port personalNote : (String -> msg) -> Sub msg
+port jsViewChange : String -> Cmd msg
 
 
-port allNotes : (String -> msg) -> Sub msg
+
+-- input
+
+
+port jsLoginUser : (User -> msg) -> Sub msg
+
+
+port jsPersonalNote : (String -> msg) -> Sub msg
+
+
+port jsAllNotes : (String -> msg) -> Sub msg
+
+
+
+-- Main Program
 
 
 main : Program Never Model Msg
@@ -119,20 +136,25 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         Login ->
-            ( { model | state = "logging" }, login () )
+            ( { model | state = "logging" }, jsLogin () )
 
         GotDate date ->
             ( { model | currentDate = Just date }, Cmd.none )
 
         LoginUser user ->
-            ( { model | user = Just user }, getNotes (NoteID user.name (getCurrentWeekNumber model.currentDate)) )
+            ( { model | user = Just user }
+            , Cmd.batch
+                [ jsGetAllNotes (NoteID user.name (getCurrentWeekNumber model.currentDate))
+                , jsGetPersonalNotes (NoteID user.name (getCurrentWeekNumber model.currentDate))
+                ]
+            )
 
         RouteMain route ->
             ( { model | route = route }
             , if route == model.route then
                 Cmd.none
               else
-                viewChange (toString route)
+                jsViewChange (toString route)
             )
 
         GetAllNotes notes ->
@@ -140,7 +162,7 @@ update msg model =
 
         GetPersonalNote note ->
             ( { model | personalNote = Just note }
-            , (setPersonalNote (UserNote (getUserName model.user) (getCurrentWeekNumber model.currentDate) note))
+            , (jsSetPersonalNote (UserNote (getUserName model.user) (getCurrentWeekNumber model.currentDate) note))
             )
 
 
@@ -151,9 +173,9 @@ update msg model =
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
-        [ loginUser LoginUser
-        , personalNote GetPersonalNote
-        , allNotes GetAllNotes
+        [ jsLoginUser LoginUser
+        , jsPersonalNote GetPersonalNote
+        , jsAllNotes GetAllNotes
         ]
 
 
@@ -201,7 +223,7 @@ summaryView model =
     div []
         [ text "Hello "
         , b [] [ text (getUserName model.user) ]
-        , pre [] [ text (getAllNotes model.allNotes) ]
+        , Markdown.toHtml [ class "summary-container" ] (getAllNotes model.allNotes)
         ]
 
 
@@ -280,6 +302,19 @@ loginView model =
 
 
 -- Helpers
+
+
+plusOne : Int -> Int
+plusOne n =
+    n + 1
+
+
+getNextWeekNumber : Maybe Date -> String
+getNextWeekNumber date =
+    Maybe.map Date.weekNumber date
+        |> Maybe.withDefault 0
+        |> plusOne
+        |> toString
 
 
 getCurrentWeekNumber : Maybe Date -> String

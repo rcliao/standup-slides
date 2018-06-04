@@ -15,7 +15,7 @@ export class NotesDAO {
         return this.storage.collection('notes')
             .doc(id)
             .onSnapshot(doc => {
-                cb(doc[username]);
+                cb(doc.data()[username]);
             });
     }
 

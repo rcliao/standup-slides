@@ -1,6 +1,7 @@
 /* basic typography */
 html {
     font-size: 16px;
+    overflow: auto;
 }
 
 body {
@@ -79,12 +80,10 @@ h1, h2, h3, h4, h5, h6 {
     margin: 0 1em;
 }
 
-.main-container pre {
+.main-container .summary-container {
     background-color: rgba(0, 0, 0, 0.3);
     padding: 0.5em;
     border-radius: 3px;
-    max-height: 20em;
-    overflow: auto;
 }
 
 .standup-container {
