@@ -15,7 +15,6 @@ noteTemplate username =
         ++ username
         ++ """
 
-
 ## Last week
 * Work on feature 1
 
@@ -46,6 +45,9 @@ port jsSetPersonalNote : UserNote -> Cmd msg
 
 
 port jsViewChange : String -> Cmd msg
+
+
+port jsFullScreen : String -> Cmd msg
 
 
 
@@ -130,6 +132,7 @@ type Msg
     | GetAllNotes String
     | GetPersonalNote String
     | GotDate Date
+    | RequestFullScreen String
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -164,6 +167,9 @@ update msg model =
             ( { model | personalNote = Just note }
             , (jsSetPersonalNote (UserNote (getUserName model.user) (getCurrentWeekNumber model.currentDate) note))
             )
+
+        RequestFullScreen selector ->
+            ( model, (jsFullScreen selector) )
 
 
 
@@ -235,7 +241,16 @@ notesView model =
 standUpView : Model -> Html Msg
 standUpView model =
     div [ class "standup-container" ]
-        [ div [ class "reveal" ]
+        [ div [ class "actions" ]
+            [ node "mwc-button"
+                [ class "light"
+                , attribute "onClick" "window.requestFullScreen()"
+                , attribute "raised" "true"
+                , attribute "label" "Full Screen"
+                ]
+                []
+            ]
+        , div [ class "reveal" ]
             [ div [ class "slides" ]
                 [ section
                     [ attribute "data-markdown" ""

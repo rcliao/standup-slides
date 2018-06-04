@@ -77,3 +77,19 @@ elmService.on('jsViewChange', viewName => {
         });
     }
 });
+window.requestFullScreen = function() {
+    const dom = document.querySelector('.reveal');
+    if (!dom) {
+        console.error("SELECTOR: \".reveal\" is not found for full screen request. Skipping.");
+        return;
+    }
+    if(dom.requestFullscreen) {
+        dom.requestFullscreen();
+    } else if(dom.mozRequestFullScreen) {
+        dom.mozRequestFullScreen();
+    } else if(dom.webkitRequestFullscreen) {
+        dom.webkitRequestFullscreen();
+    } else if(dom.msRequestFullscreen) {
+        dom.msRequestFullscreen();
+    }
+};
