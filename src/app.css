@@ -98,7 +98,14 @@ h4 {
 }
 
 .standup-container {
-    height: 20em;
+    height: 30em;
+}
+.main-container .reveal {
+    background-size: cover;
+}
+.main-container .reveal .slides > section > section.present {
+    background-color: rgba(0, 0, 0, 0.3);
+    border-radius: 5px;
 }
 
 /* hacks */
