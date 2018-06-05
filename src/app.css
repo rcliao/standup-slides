@@ -133,3 +133,6 @@ h4 {
     background-color: #222;
     color: #fff;
 }
+.main-container .CodeMirror-cursor {
+    border-left: 2px solid #fff;
+}
