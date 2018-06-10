@@ -33,6 +33,7 @@ export default class Service {
                         }
                         var user = result.user;
                         resolve({
+                            id: user.uid,
                             name: user.displayName,
                             photoURL: user.photoURL
                         });

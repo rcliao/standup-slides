@@ -43,7 +43,7 @@ elmService.on('jsLogin', () => {
 });
 elmService.on('jsGetPersonalNotes', dateID => {
     notesDAO.getPersonalNote(dateID.id, dateID.username, data => {
-        elmService.send('jsPersonalNote', data);
+        elmService.send('jsPersonalNote', data || '');
     });
 });
 elmService.on('jsGetAllNotes', dateID => {

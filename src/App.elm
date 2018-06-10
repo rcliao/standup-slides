@@ -102,7 +102,8 @@ type alias NoteID =
 
 
 type alias User =
-    { name : String
+    { id : String
+    , name : String
     , photoURL : String
     }
 
@@ -148,8 +149,8 @@ update msg model =
         LoginUser user ->
             ( { model | user = Just user }
             , Cmd.batch
-                [ jsGetAllNotes (NoteID user.name (getCurrentWeekNumber model.currentDate))
-                , jsGetPersonalNotes (NoteID user.name (getCurrentWeekNumber model.currentDate))
+                [ jsGetAllNotes (NoteID (user.id ++ user.name) (getCurrentWeekNumber model.currentDate))
+                , jsGetPersonalNotes (NoteID (user.id ++ user.name) (getCurrentWeekNumber model.currentDate))
                 ]
             )
 
