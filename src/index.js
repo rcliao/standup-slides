@@ -53,10 +53,6 @@ elmService.on('jsGetAllNotes', dateID => {
             .map(name => {
                 return notes[name];
             })
-            // randomize presentation order
-            .map(a => [Math.random(), a])
-            .sort((a, b) => a[0] - b[0])
-            .map(a => a[1])
             .reduce((accu, note) => {
                 return accu + '\n\n\n\n' + note;
             }, '# Stand-up Notes');
