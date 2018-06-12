@@ -1,5 +1,6 @@
 /* basic typography */
 html, body {
+    /* Need to overwrite because reveal.js disable overflows */
     overflow: auto;
 }
 
@@ -104,7 +105,7 @@ h4 {
     background-size: cover;
 }
 .main-container .reveal .slides > section > section.present {
-    background-color: rgba(0, 0, 0, 0.3);
+    background-color: rgba(0, 0, 0, 0.6);
     border-radius: 5px;
 }
 

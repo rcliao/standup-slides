@@ -48,9 +48,6 @@ port jsSetPersonalNote : UserNote -> Cmd msg
 port jsViewChange : String -> Cmd msg
 
 
-port jsFullScreen : String -> Cmd msg
-
-
 
 -- input
 
@@ -120,7 +117,15 @@ type alias Model =
 
 init : ( Model, Cmd Msg )
 init =
-    ( Model Nothing Nothing Nothing Nothing Summary "", (Task.perform GotDate Date.now) )
+    ( Model
+        Nothing
+        Nothing
+        Nothing
+        Nothing
+        Summary
+        ""
+    , (Task.perform GotDate Date.now)
+    )
 
 
 
@@ -134,7 +139,6 @@ type Msg
     | GetAllNotes String
     | GetPersonalNote String
     | GotDate Date
-    | RequestFullScreen String
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -169,9 +173,6 @@ update msg model =
             ( { model | personalNote = Just note }
             , (jsSetPersonalNote (UserNote (getUserName model.user) (getCurrentWeekNumber model.currentDate) note))
             )
-
-        RequestFullScreen selector ->
-            ( model, (jsFullScreen selector) )
 
 
 

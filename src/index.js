@@ -79,6 +79,8 @@ elmService.on('jsViewChange', viewName => {
         });
     }
 });
+// needing to use window space ecause browser warning about the fullscreen must
+// be initiated from the JavaScript click event
 window.requestFullScreen = function() {
     const dom = document.querySelector('.reveal');
     if (!dom) {
