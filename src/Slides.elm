@@ -1,6 +1,8 @@
 module Slides exposing (..)
 
 import Html exposing (..)
+import Html.Attributes exposing (..)
+import Markdown
 import String exposing (split)
 
 
@@ -60,4 +62,21 @@ toSlide content =
 
 view : Model -> Html Msg
 view model =
-    div [] []
+    div
+        [ class "slides-container" ]
+        (toSlideHtmls model.slides)
+
+
+toSlideHtmls : List (List Slide) -> List (Html Msg)
+toSlideHtmls slides =
+    List.map toSlideSectionHtml slides
+
+
+toSlideSectionHtml : List Slide -> Html Msg
+toSlideSectionHtml slides =
+    section [] (List.map toSlideHtml slides)
+
+
+toSlideHtml : Slide -> Html msg
+toSlideHtml slide =
+    Markdown.toHtml [] slide.content
