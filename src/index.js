@@ -73,11 +73,11 @@ elmService.on('jsViewChange', viewName => {
     } else {
         cleanupEditor();
     }
-    if (viewName === 'StandUp') {
-        requestAnimationFrame(function() {
-            renderSlides();
-        });
-    }
+    // if (viewName === 'StandUp') {
+    //     requestAnimationFrame(function() {
+    //         renderSlides();
+    //     });
+    // }
 });
 // needing to use window space ecause browser warning about the fullscreen must
 // be initiated from the JavaScript click event

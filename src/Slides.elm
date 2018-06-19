@@ -6,14 +6,7 @@ import Markdown
 import String exposing (split)
 
 
-verticalSeperator : String
-verticalSeperator =
-    "\n\n"
-
-
-horizontalSeperator : String
-horizontalSeperator =
-    "\n\n\n"
+-- model
 
 
 type alias Slide =
@@ -33,12 +26,20 @@ type alias Model =
     }
 
 
-type Msg
-    = ChangeSlide
+
+-- init
+
+
+init : Model
+init =
+    Model (Axis 0 0) []
 
 
 
--- TODO: Need to parse input string to a list of slides
+-- update
+-- type Msg
+--     = ChangeSlide
+-- view
 
 
 parse : String -> List (List Slide)
@@ -60,23 +61,33 @@ toSlide content =
 -- TODO: have style to scale elements to center
 
 
-view : Model -> Html Msg
+view : Model -> Html msg
 view model =
     div
         [ class "slides-container" ]
         (toSlideHtmls model.slides)
 
 
-toSlideHtmls : List (List Slide) -> List (Html Msg)
+toSlideHtmls : List (List Slide) -> List (Html msg)
 toSlideHtmls slides =
     List.map toSlideSectionHtml slides
 
 
-toSlideSectionHtml : List Slide -> Html Msg
+toSlideSectionHtml : List Slide -> Html msg
 toSlideSectionHtml slides =
-    section [] (List.map toSlideHtml slides)
+    section [ class "horizontal-section" ] (List.map toSlideHtml slides)
 
 
 toSlideHtml : Slide -> Html msg
 toSlideHtml slide =
-    Markdown.toHtml [] slide.content
+    Markdown.toHtml [ class "vertical-section" ] slide.content
+
+
+verticalSeperator : String
+verticalSeperator =
+    "\n\n\n"
+
+
+horizontalSeperator : String
+horizontalSeperator =
+    "\n\n\n\n"

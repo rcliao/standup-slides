@@ -7,6 +7,7 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Markdown
 import Task
+import Slides
 
 
 noteTemplate : String -> String
@@ -111,6 +112,7 @@ type alias Model =
     , personalNote : Maybe String
     , allNotes : Maybe String
     , route : Route
+    , slides : Slides.Model
     , state : String
     }
 
@@ -123,6 +125,7 @@ init =
         Nothing
         Nothing
         Summary
+        Slides.init
         ""
     , (Task.perform GotDate Date.now)
     )
@@ -199,10 +202,12 @@ view model =
 
 simpleRoute : Model -> Html Msg
 simpleRoute model =
-    if model.user /= Nothing then
-        mainView model
-    else
-        loginView model
+    case model.user of
+        Just _ ->
+            mainView model
+
+        Nothing ->
+            loginView model
 
 
 mainView : Model -> Html Msg
@@ -244,31 +249,28 @@ notesView model =
 standUpView : Model -> Html Msg
 standUpView model =
     div [ class "standup-container" ]
-        [ div [ class "actions" ]
-            [ node "mwc-button"
-                [ class "light"
-                , attribute "onClick" "window.requestFullScreen()"
-                , attribute "raised" "true"
-                , attribute "label" "Full Screen"
-                ]
-                []
-            ]
-        , div [ class "reveal" ]
-            [ div [ class "slides" ]
-                [ section
-                    [ attribute "data-markdown" ""
-                    , attribute "data-separator" "^\\r?\\n\\r?\\n\\r?\\n"
-                    , attribute "data-separator-vertical" "^\\r?\\n\\r?\\n"
-                    , attribute "data-charset" "iso-8859-15"
-                    ]
-                    [ textarea
-                        [ attribute "data-template" ""
-                        ]
-                        [ text (getAllNotes model.allNotes) ]
-                    ]
-                ]
-            ]
+        [ (Slides.view
+            (Slides.Model (Slides.Axis 0 0) (Slides.parse (getAllNotes model.allNotes)))
+          )
         ]
+
+
+
+-- , div [ class "reveal" ]
+--     [ div [ class "slides" ]
+--         [ section
+--             [ attribute "data-markdown" ""
+--             , attribute "data-separator" "^\\r?\\n\\r?\\n\\r?\\n"
+--             , attribute "data-separator-vertical" "^\\r?\\n\\r?\\n"
+--             , attribute "data-charset" "iso-8859-15"
+--             ]
+--             [ textarea
+--                 [ attribute "data-template" ""
+--                 ]
+--                 [ text (getAllNotes model.allNotes) ]
+--             ]
+--         ]
+--     ]
 
 
 mainNavView : Model -> Html Msg
