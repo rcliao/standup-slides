@@ -21,7 +21,7 @@ type alias Axis =
 
 
 type alias Model =
-    { index : Axis
+    { axis : Axis
     , slides : List (List Slide)
     }
 
@@ -65,22 +65,36 @@ view : Model -> Html msg
 view model =
     div
         [ class "slides-container" ]
-        (toSlideHtmls model.slides)
+        (toSlideHtmls model.slides model.axis)
 
 
-toSlideHtmls : List (List Slide) -> List (Html msg)
-toSlideHtmls slides =
-    List.map toSlideSectionHtml slides
+toSlideHtmls : List (List Slide) -> Axis -> List (Html msg)
+toSlideHtmls slides axis =
+    List.indexedMap (toSlideSectionHtml axis) slides
+        |> List.filterMap identity
 
 
-toSlideSectionHtml : List Slide -> Html msg
-toSlideSectionHtml slides =
-    section [ class "horizontal-section" ] (List.map toSlideHtml slides)
+toSlideSectionHtml : Axis -> Int -> List Slide -> Maybe (Html msg)
+toSlideSectionHtml axis i slides =
+    if axis.x == i then
+        Just
+            (section
+                [ class "horizontal-section"
+                ]
+                (List.indexedMap (toSlideHtml axis) slides
+                    |> List.filterMap identity
+                )
+            )
+    else
+        Nothing
 
 
-toSlideHtml : Slide -> Html msg
-toSlideHtml slide =
-    Markdown.toHtml [ class "vertical-section" ] slide.content
+toSlideHtml : Axis -> Int -> Slide -> Maybe (Html msg)
+toSlideHtml axis i slide =
+    if axis.y == i then
+        Just (Markdown.toHtml [ class "vertical-section" ] slide.content)
+    else
+        Nothing
 
 
 verticalSeperator : String
