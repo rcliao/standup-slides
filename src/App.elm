@@ -113,6 +113,7 @@ type alias Model =
     , allNotes : Maybe String
     , route : Route
     , slides : Slides.Model
+    , slideAxies : Slides.Axis
     , state : String
     }
 
@@ -126,6 +127,7 @@ init =
         Nothing
         Summary
         Slides.init
+        (Slides.Axis 0 0)
         ""
     , (Task.perform GotDate Date.now)
     )
@@ -255,24 +257,6 @@ standUpView model =
         ]
 
 
-
--- , div [ class "reveal" ]
---     [ div [ class "slides" ]
---         [ section
---             [ attribute "data-markdown" ""
---             , attribute "data-separator" "^\\r?\\n\\r?\\n\\r?\\n"
---             , attribute "data-separator-vertical" "^\\r?\\n\\r?\\n"
---             , attribute "data-charset" "iso-8859-15"
---             ]
---             [ textarea
---                 [ attribute "data-template" ""
---                 ]
---                 [ text (getAllNotes model.allNotes) ]
---             ]
---         ]
---     ]
-
-
 mainNavView : Model -> Html Msg
 mainNavView model =
     nav
@@ -324,16 +308,11 @@ loginView model =
 -- Helpers
 
 
-plusOne : Int -> Int
-plusOne n =
-    n + 1
-
-
 getNextWeekNumber : Maybe Date -> String
 getNextWeekNumber date =
     Maybe.map Date.weekNumber date
         |> Maybe.withDefault 0
-        |> plusOne
+        |> ((+) 1)
         |> toString
 
 
