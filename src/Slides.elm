@@ -37,9 +37,21 @@ init =
 
 
 -- update
--- type Msg
---     = ChangeSlide
--- view
+
+
+type Msg
+    = ChangeSlide Axis
+
+
+update : Msg -> Model -> ( Model, Cmd Msg )
+update msg model =
+    case msg of
+        ChangeSlide axis ->
+            ( { model | axis = axis }, Cmd.none )
+
+
+
+--  view
 
 
 parse : String -> List (List Slide)
