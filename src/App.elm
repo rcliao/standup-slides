@@ -6,6 +6,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Markdown
+import Keyboard
 import Task
 import Slides
 
@@ -112,8 +113,8 @@ type alias Model =
     , personalNote : Maybe String
     , allNotes : Maybe String
     , route : Route
-    , slides : Slides.Model
-    , slideAxies : Slides.Axis
+    , slides : List (List Slides.Slide)
+    , slideAxis : Slides.Axis
     , state : String
     }
 
@@ -126,7 +127,7 @@ init =
         Nothing
         Nothing
         Summary
-        Slides.init
+        []
         (Slides.Axis 0 0)
         ""
     , (Task.perform GotDate Date.now)
@@ -144,6 +145,7 @@ type Msg
     | GetAllNotes String
     | GetPersonalNote String
     | GotDate Date
+    | KeyMsg Keyboard.KeyCode
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -172,12 +174,49 @@ update msg model =
             )
 
         GetAllNotes notes ->
-            ( { model | allNotes = Just notes }, Cmd.none )
+            ( { model | allNotes = Just notes, slides = (Slides.parse (getAllNotes (Just notes))) }, Cmd.none )
 
         GetPersonalNote note ->
             ( { model | personalNote = Just note }
             , (jsSetPersonalNote (UserNote (getUserName model.user) (getCurrentWeekNumber model.currentDate) note))
             )
+
+        KeyMsg code ->
+            case code of
+                -- left
+                37 ->
+                    ( { model
+                        | slideAxis = (Slides.slideLeft model.slideAxis model.slides)
+                      }
+                    , Cmd.none
+                    )
+
+                -- up
+                38 ->
+                    ( { model
+                        | slideAxis = (Slides.slideUp model.slideAxis model.slides)
+                      }
+                    , Cmd.none
+                    )
+
+                -- right
+                39 ->
+                    ( { model
+                        | slideAxis = (Slides.slideRight model.slideAxis model.slides)
+                      }
+                    , Cmd.none
+                    )
+
+                -- down
+                40 ->
+                    ( { model
+                        | slideAxis = (Slides.slideDown model.slideAxis model.slides)
+                      }
+                    , Cmd.none
+                    )
+
+                _ ->
+                    ( model, Cmd.none )
 
 
 
@@ -190,6 +229,7 @@ subscriptions model =
         [ jsLoginUser LoginUser
         , jsPersonalNote GetPersonalNote
         , jsAllNotes GetAllNotes
+        , Keyboard.downs KeyMsg
         ]
 
 
@@ -252,7 +292,7 @@ standUpView : Model -> Html Msg
 standUpView model =
     div [ class "standup-container" ]
         [ (Slides.view
-            (Slides.Model (Slides.Axis 0 0) (Slides.parse (getAllNotes model.allNotes)))
+            (Slides.Model model.slideAxis model.slides)
           )
         ]
 

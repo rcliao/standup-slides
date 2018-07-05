@@ -3,6 +3,8 @@ module Slides exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Markdown
+import List
+import Maybe
 import String exposing (split)
 
 
@@ -35,19 +37,24 @@ init =
     Model (Axis 0 0) []
 
 
-
--- update
-
-
-type Msg
-    = ChangeSlide Axis
+slideUp : Axis -> List (List Slide) -> Axis
+slideUp axis slides =
+    (Axis axis.x (Basics.max 0 (axis.y - 1)))
 
 
-update : Msg -> Model -> ( Model, Cmd Msg )
-update msg model =
-    case msg of
-        ChangeSlide axis ->
-            ( { model | axis = axis }, Cmd.none )
+slideDown : Axis -> List (List Slide) -> Axis
+slideDown axis slides =
+    (Axis axis.x (Basics.min ((getSubLength axis.x slides) - 1) (axis.y + 1)))
+
+
+slideLeft : Axis -> List (List Slide) -> Axis
+slideLeft axis model =
+    (Axis (Basics.max 0 (axis.x - 1)) 0)
+
+
+slideRight : Axis -> List (List Slide) -> Axis
+slideRight axis slides =
+    (Axis (Basics.min ((List.length slides) - 1) (axis.x + 1)) 0)
 
 
 
@@ -77,7 +84,10 @@ view : Model -> Html msg
 view model =
     div
         [ class "slides-container" ]
-        (toSlideHtmls model.slides model.axis)
+        (List.append
+            (toSlideHtmls model.slides model.axis)
+            [ div [ class "axis" ] [ text (toString model.axis.x ++ "," ++ toString model.axis.y) ] ]
+        )
 
 
 toSlideHtmls : List (List Slide) -> Axis -> List (Html msg)
@@ -117,3 +127,15 @@ verticalSeperator =
 horizontalSeperator : String
 horizontalSeperator =
     "\n\n\n\n"
+
+
+
+-- helpers
+
+
+getSubLength : Int -> List (List a) -> Int
+getSubLength i list =
+    List.drop i list
+        |> List.head
+        |> Maybe.withDefault []
+        |> List.length
