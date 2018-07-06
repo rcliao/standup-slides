@@ -5,10 +5,10 @@ import Date.Extra as Date
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
-import Markdown
 import Keyboard
-import Task
+import Markdown
 import Slides
+import Task
 
 
 noteTemplate : String -> String

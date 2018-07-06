@@ -1,7 +1,10 @@
 module Slides exposing (..)
 
-import Html exposing (..)
-import Html.Attributes exposing (..)
+import Css exposing (..)
+import Html
+import Html.Attributes
+import Html.Styled exposing (..)
+import Html.Styled.Attributes exposing (..)
 import Markdown
 import List
 import Maybe
@@ -80,13 +83,35 @@ toSlide content =
 -- TODO: have style to scale elements to center
 
 
-view : Model -> Html msg
+view : Model -> Html.Html msg
 view model =
-    div
-        [ class "slides-container" ]
-        (List.append
-            (toSlideHtmls model.slides model.axis)
-            [ div [ class "axis" ] [ text (toString model.axis.x ++ "," ++ toString model.axis.y) ] ]
+    toUnstyled
+        (div
+            [ class "slides-container"
+            , css
+                [ Css.height (Css.em 30)
+                , displayFlex
+                , backgroundColor (hex "#666")
+                , alignItems center
+                , justifyContent center
+                , textAlign center
+                , flexDirection column
+                , position relative
+                ]
+            ]
+            (List.append
+                (toSlideHtmls model.slides model.axis)
+                [ div
+                    [ class "axis"
+                    , css
+                        [ position absolute
+                        , bottom (Css.em 0.5)
+                        , right (Css.em 1)
+                        ]
+                    ]
+                    [ text (toString model.axis.x ++ "," ++ toString model.axis.y) ]
+                ]
+            )
         )
 
 
@@ -114,7 +139,7 @@ toSlideSectionHtml axis i slides =
 toSlideHtml : Axis -> Int -> Slide -> Maybe (Html msg)
 toSlideHtml axis i slide =
     if axis.y == i then
-        Just (Markdown.toHtml [ class "vertical-section" ] slide.content)
+        Just (Html.Styled.fromUnstyled (Markdown.toHtml [ Html.Attributes.class "vertical-section" ] slide.content))
     else
         Nothing
 

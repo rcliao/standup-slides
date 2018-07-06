@@ -138,20 +138,6 @@ h4 {
     border-left: 2px solid #fff;
 }
 
-.slides-container {
-    height: 30em;
-    background-color: #666;
-    display: flex;
-    justify-content: center;
-    align-content: center;
-    flex-direction: column;
-    text-align: center;
-    position: relative;
-}
-
 .slides-container .axis {
-    position: absolute;
-    bottom: 0.5em;
-    right: 1em;
     opacity: 0.6;
 }
