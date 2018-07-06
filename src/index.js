@@ -8,7 +8,6 @@ import 'simplemde/dist/simplemde.min.css';
 import './index.html';
 
 import { render as renderEditor, cleanup as cleanupEditor} from './views/editor';
-import { render as renderSlides } from './views/slides';
 import FirebaseService from './services/firebase';
 import ElmService from './services/elm';
 import {NotesDAO} from './dao/firebase';
@@ -73,18 +72,13 @@ elmService.on('jsViewChange', viewName => {
     } else {
         cleanupEditor();
     }
-    // if (viewName === 'StandUp') {
-    //     requestAnimationFrame(function() {
-    //         renderSlides();
-    //     });
-    // }
 });
 // needing to use window space ecause browser warning about the fullscreen must
 // be initiated from the JavaScript click event
 window.requestFullScreen = function() {
-    const dom = document.querySelector('.reveal');
+    const dom = document.querySelector('.slides-container');
     if (!dom) {
-        console.error("SELECTOR: \".reveal\" is not found for full screen request. Skipping.");
+        console.error("SELECTOR: \".slides-container\" is not found for full screen request. Skipping.");
         return;
     }
     if(dom.requestFullscreen) {
