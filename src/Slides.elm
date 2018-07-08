@@ -91,7 +91,6 @@ view model =
             , css
                 [ Css.height (Css.em 30)
                 , displayFlex
-                , backgroundColor (hex "#666")
                 , alignItems center
                 , justifyContent center
                 , textAlign center

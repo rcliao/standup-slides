@@ -145,6 +145,7 @@ type Msg
     | GetAllNotes String
     | GetPersonalNote String
     | GotDate Date
+    | OnNoteChange String
     | KeyMsg Keyboard.KeyCode
 
 
@@ -177,6 +178,9 @@ update msg model =
             ( { model | allNotes = Just notes, slides = (Slides.parse (getAllNotes (Just notes))) }, Cmd.none )
 
         GetPersonalNote note ->
+            ( { model | personalNote = Just note }, Cmd.none )
+
+        OnNoteChange note ->
             ( { model | personalNote = Just note }
             , (jsSetPersonalNote (UserNote (getUserName model.user) (getCurrentWeekNumber model.currentDate) note))
             )
@@ -279,18 +283,20 @@ summaryView model =
     div []
         [ text "Hello "
         , b [] [ text (getUserName model.user) ]
-        , Markdown.toHtml [ class "summary-container" ] (getAllNotes model.allNotes)
+        , Markdown.toHtml [ class "summary-container content-area" ] (getAllNotes model.allNotes)
         ]
 
 
 notesView : Model -> Html Msg
 notesView model =
-    textarea [ id "note_editor" ] [ text (getPersonalNote model.personalNote model.user) ]
+    textarea
+        [ id "note_editor", class "note-editor", onInput OnNoteChange ]
+        [ text (getPersonalNote model.personalNote model.user) ]
 
 
 standUpView : Model -> Html Msg
 standUpView model =
-    div [ class "standup-container" ]
+    div [ class "standup-container content-area" ]
         [ (Slides.view
             (Slides.Model model.slideAxis model.slides)
           )
@@ -333,13 +339,11 @@ loginView model =
         [ class "login-container" ]
         [ div [ class "animated fadeInDown" ]
             [ h1 [] [ text "Stand-up Notes" ]
-            , node "mwc-button"
-                [ class "light"
+            , button
+                [ class "btn"
                 , onClick Login
-                , attribute "raised" "true"
-                , attribute "label" "Login with Github"
                 ]
-                []
+                [ text "Login with Github" ]
             ]
         ]
 

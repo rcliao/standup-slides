@@ -1,16 +1,13 @@
 import 'animate.css';
 import './app.css';
 
-import '@material/mwc-button';
-import 'simplemde/dist/simplemde.min.css';
-
 // Require index.html so it gets copied to dist
 import './index.html';
 
-import { render as renderEditor, cleanup as cleanupEditor} from './views/editor';
 import FirebaseService from './services/firebase';
 import ElmService from './services/elm';
 import {NotesDAO} from './dao/firebase';
+
 import * as Elm from './App.elm';
 
 // constant configurations
@@ -59,20 +56,10 @@ elmService.on('jsGetAllNotes', dateID => {
     });
 });
 elmService.on('jsSetPersonalNote', note => {
+    console.log(note);
     notesDAO.setPersonalNote(note.id, note.username, note.content);
 });
-elmService.on('jsViewChange', viewName => {
-    if (viewName === 'Notes') {
-        // need animation frame to render after elm is done rendering
-        requestAnimationFrame(function () { 
-            renderEditor(value => {
-                elmService.send('jsPersonalNote', value);
-            });
-        });
-    } else {
-        cleanupEditor();
-    }
-});
+
 // needing to use window space ecause browser warning about the fullscreen must
 // be initiated from the JavaScript click event
 window.requestFullScreen = function() {
