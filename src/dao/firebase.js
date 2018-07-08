@@ -14,8 +14,13 @@ export class NotesDAO {
     getPersonalNote (id, username, cb) {
         return this.storage.collection('notes')
             .doc(id)
-            .onSnapshot(doc => {
-                cb(doc.data()[username]);
+            .get()
+            .then(doc => {
+                if (doc.exists) {
+                    cb(doc.data()[username]);
+                } else {
+                    cb('');
+                }
             });
     }
 

@@ -161,8 +161,8 @@ update msg model =
         LoginUser user ->
             ( { model | user = Just user }
             , Cmd.batch
-                [ jsGetAllNotes (NoteID (user.id ++ user.name) (getCurrentWeekNumber model.currentDate))
-                , jsGetPersonalNotes (NoteID (user.id ++ user.name) (getCurrentWeekNumber model.currentDate))
+                [ jsGetAllNotes (NoteID (user.name) (getCurrentWeekNumber model.currentDate))
+                , jsGetPersonalNotes (NoteID (user.name) (getCurrentWeekNumber model.currentDate))
                 ]
             )
 
