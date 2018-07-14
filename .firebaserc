@@ -1,5 +1,6 @@
 {
   "projects": {
-    "default": "standup-notes"
+    "default": "standup-notes",
+    "devops": "edlio-devops-standup"
   }
 }

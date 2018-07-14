@@ -338,7 +338,7 @@ loginView model =
     div
         [ class "login-container" ]
         [ div [ class "animated fadeInDown" ]
-            [ h1 [] [ text "Stand-up Notes" ]
+            [ h1 [] [ text "DevOps Stand-up Notes" ]
             , button
                 [ class "btn"
                 , onClick Login

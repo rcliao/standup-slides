@@ -16,11 +16,7 @@ export class NotesDAO {
             .doc(id)
             .get()
             .then(doc => {
-                if (doc.exists) {
-                    cb(doc.data()[username]);
-                } else {
-                    cb('');
-                }
+                cb(doc.data()[username]);
             });
     }
 

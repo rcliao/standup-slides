@@ -7,16 +7,11 @@ import './index.html';
 import FirebaseService from './services/firebase';
 import ElmService from './services/elm';
 import {NotesDAO} from './dao/firebase';
+import {authorizedOrganizations, config} from './configs';
 
 import * as Elm from './App.elm';
 
 // constant configurations
-const authorizedOrganizations = ['Edlio'];
-const config = {
-    apiKey: 'AIzaSyBVYU5wYUV-qnk0ne2_rxJCZyFEFxAlEOs',
-    authDomain: 'standup-notes.firebaseapp.com',
-    projectId: 'standup-notes'
-};
 
 const mountNode = document.getElementById('main');
 const app = Elm.Main.embed(mountNode);
