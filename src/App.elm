@@ -87,6 +87,11 @@ type Route
     | StandUp
 
 
+type EditorRoute
+    = Editor
+    | Preview
+
+
 type alias UserNote =
     { username : String
     , id : String
@@ -114,6 +119,7 @@ type alias Model =
     , personalNote : Maybe String
     , allNotes : Maybe String
     , route : Route
+    , editorRoute : EditorRoute
     , slides : List (List Slides.Slide)
     , personalSlides : List (List Slides.Slide)
     , slideAxis : Slides.Axis
@@ -131,6 +137,7 @@ init =
         Nothing
         Nothing
         Summary
+        Editor
         []
         []
         (Slides.Axis 0 0)
@@ -148,6 +155,7 @@ type Msg
     = Login
     | LoginUser User
     | RouteMain Route
+    | RouteEditor EditorRoute
     | GetAllNotes String
     | GetPersonalNote String
     | GotDate Date
@@ -174,6 +182,11 @@ update msg model =
 
         RouteMain route ->
             ( { model | route = route }
+            , Cmd.none
+            )
+
+        RouteEditor route ->
+            ( { model | editorRoute = route }
             , Cmd.none
             )
 
@@ -349,13 +362,40 @@ summaryView model =
 notesView : Model -> Html Msg
 notesView model =
     div []
-        [ textarea
-            [ id "note_editor", class "note-editor", onInput OnNoteChange ]
-            [ text (getPersonalNote model.personalNote model.user) ]
-        , (Slides.view
-            (Slides.Model model.personalSlideAxis model.personalSlides)
-          )
+        [ div []
+            [ button
+                [ class (getNotesButtonClass model.editorRoute Editor), onClick (RouteEditor Editor) ]
+                [ text "Editor" ]
+            , button
+                [ class (getNotesButtonClass model.editorRoute Preview), onClick (RouteEditor Preview) ]
+                [ text "Preview" ]
+            ]
+        , notesMainView model model.editorRoute
         ]
+
+
+getNotesButtonClass : EditorRoute -> EditorRoute -> String
+getNotesButtonClass currentRoute expectedRoute =
+    if currentRoute == expectedRoute then
+        "btn active"
+    else
+        "btn"
+
+
+notesMainView : Model -> EditorRoute -> Html Msg
+notesMainView model route =
+    case route of
+        Editor ->
+            textarea
+                [ id "note_editor", class "note-editor", onInput OnNoteChange ]
+                [ text (getPersonalNote model.personalNote model.user) ]
+
+        Preview ->
+            div [ class "content-area" ]
+                [ (Slides.view
+                    (Slides.Model model.personalSlideAxis model.personalSlides)
+                  )
+                ]
 
 
 standUpView : Model -> Html Msg
