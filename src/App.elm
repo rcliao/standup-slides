@@ -108,13 +108,16 @@ type alias User =
 
 
 type alias Model =
-    { user : Maybe User
+    { title : String
+    , user : Maybe User
     , currentDate : Maybe Date
     , personalNote : Maybe String
     , allNotes : Maybe String
     , route : Route
     , slides : List (List Slides.Slide)
+    , personalSlides : List (List Slides.Slide)
     , slideAxis : Slides.Axis
+    , personalSlideAxis : Slides.Axis
     , state : String
     }
 
@@ -122,12 +125,15 @@ type alias Model =
 init : ( Model, Cmd Msg )
 init =
     ( Model
+        "Edlio Team Blue Stand-up Notes"
         Nothing
         Nothing
         Nothing
         Nothing
         Summary
         []
+        []
+        (Slides.Axis 0 0)
         (Slides.Axis 0 0)
         ""
     , (Task.perform GotDate Date.now)
@@ -168,56 +174,109 @@ update msg model =
 
         RouteMain route ->
             ( { model | route = route }
-            , if route == model.route then
-                Cmd.none
-              else
-                jsViewChange (toString route)
+            , Cmd.none
             )
 
         GetAllNotes notes ->
-            ( { model | allNotes = Just notes, slides = (Slides.parse (getAllNotes (Just notes))) }, Cmd.none )
+            ( { model
+                | allNotes = Just notes
+                , slides = (Slides.parse (getAllNotes (Just notes)))
+              }
+            , Cmd.none
+            )
 
         GetPersonalNote note ->
-            ( { model | personalNote = Just note }, Cmd.none )
+            ( { model
+                | personalNote = Just note
+                , personalSlides = (Slides.parse (getPersonalNote (Just note) model.user))
+                , personalSlideAxis = Slides.Axis 0 0
+              }
+            , Cmd.none
+            )
 
         OnNoteChange note ->
-            ( { model | personalNote = Just note }
+            ( { model
+                | personalNote = Just note
+                , personalSlides = (Slides.parse (getPersonalNote (Just note) model.user))
+              }
             , (jsSetPersonalNote (UserNote (getUserName model.user) (getCurrentWeekNumber model.currentDate) note))
             )
 
         KeyMsg code ->
-            case code of
-                -- left
-                37 ->
-                    ( { model
-                        | slideAxis = (Slides.slideLeft model.slideAxis model.slides)
-                      }
-                    , Cmd.none
-                    )
+            case model.route of
+                StandUp ->
+                    case code of
+                        -- left
+                        37 ->
+                            ( { model
+                                | slideAxis = (Slides.slideLeft model.slideAxis model.slides)
+                              }
+                            , Cmd.none
+                            )
 
-                -- up
-                38 ->
-                    ( { model
-                        | slideAxis = (Slides.slideUp model.slideAxis model.slides)
-                      }
-                    , Cmd.none
-                    )
+                        -- up
+                        38 ->
+                            ( { model
+                                | slideAxis = (Slides.slideUp model.slideAxis model.slides)
+                              }
+                            , Cmd.none
+                            )
 
-                -- right
-                39 ->
-                    ( { model
-                        | slideAxis = (Slides.slideRight model.slideAxis model.slides)
-                      }
-                    , Cmd.none
-                    )
+                        -- right
+                        39 ->
+                            ( { model
+                                | slideAxis = (Slides.slideRight model.slideAxis model.slides)
+                              }
+                            , Cmd.none
+                            )
 
-                -- down
-                40 ->
-                    ( { model
-                        | slideAxis = (Slides.slideDown model.slideAxis model.slides)
-                      }
-                    , Cmd.none
-                    )
+                        -- down
+                        40 ->
+                            ( { model
+                                | slideAxis = (Slides.slideDown model.slideAxis model.slides)
+                              }
+                            , Cmd.none
+                            )
+
+                        _ ->
+                            ( model, Cmd.none )
+
+                Notes ->
+                    case code of
+                        -- left
+                        37 ->
+                            ( { model
+                                | personalSlideAxis = (Slides.slideLeft model.personalSlideAxis model.personalSlides)
+                              }
+                            , Cmd.none
+                            )
+
+                        -- up
+                        38 ->
+                            ( { model
+                                | personalSlideAxis = (Slides.slideUp model.personalSlideAxis model.personalSlides)
+                              }
+                            , Cmd.none
+                            )
+
+                        -- right
+                        39 ->
+                            ( { model
+                                | personalSlideAxis = (Slides.slideRight model.personalSlideAxis model.personalSlides)
+                              }
+                            , Cmd.none
+                            )
+
+                        -- down
+                        40 ->
+                            ( { model
+                                | personalSlideAxis = (Slides.slideDown model.personalSlideAxis model.personalSlides)
+                              }
+                            , Cmd.none
+                            )
+
+                        _ ->
+                            ( model, Cmd.none )
 
                 _ ->
                     ( model, Cmd.none )
@@ -289,9 +348,14 @@ summaryView model =
 
 notesView : Model -> Html Msg
 notesView model =
-    textarea
-        [ id "note_editor", class "note-editor", onInput OnNoteChange ]
-        [ text (getPersonalNote model.personalNote model.user) ]
+    div []
+        [ textarea
+            [ id "note_editor", class "note-editor", onInput OnNoteChange ]
+            [ text (getPersonalNote model.personalNote model.user) ]
+        , (Slides.view
+            (Slides.Model model.personalSlideAxis model.personalSlides)
+          )
+        ]
 
 
 standUpView : Model -> Html Msg
@@ -338,7 +402,7 @@ loginView model =
     div
         [ class "login-container" ]
         [ div [ class "animated fadeInDown" ]
-            [ h1 [] [ text "DevOps Stand-up Notes" ]
+            [ h1 [] [ text model.title ]
             , button
                 [ class "btn"
                 , onClick Login
